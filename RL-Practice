@@ -1,0 +1,100 @@
+import random           # 导入随机模块
+
+computer_list = []     # 定义一个空列表用来存储电脑随机的数组
+player_list = []       # 定义一个空列表用来存储玩家所有猜测数组
+player_guess = []      # 定义一个空列表用来存储玩家当前猜测数组
+result1 = []           # 定义一个空列表用来存储玩家猜测数值和位置都正确的结果
+result2 = []           # 定义一个空列表用来存储玩家猜测仅位置正确的结果
+n = 0
+m = 0
+
+
+# 定义一个函数获得电脑随机数字
+def computer_num():
+    w = 0
+    global computer_list
+    computer_list = []       # 先初始化列表
+
+    while True:              # 定义循环来获得四个不重复的随机数字
+        a = random.randint(0, 9)
+        if a not in computer_list:
+            computer_list.append(a)
+            w += 1
+        if w == 4:
+            break
+
+
+# 定义函数管理玩家输入信息
+def player_num():
+    for j in range(4):                    # 利用循环获得玩家输入的猜测四个数字
+        while True:                       # 利用循环设定只能输入0到9的整数
+            guess_num = input('请输入第{}个猜测数字(0到9之间),不能重复：'.format(j + 1))
+            if not guess_num.isdigit():
+                continue
+            guess_num = int(guess_num)
+            if guess_num >= 0 and guess_num <= 9 and guess_num not in player_guess:
+                break
+        player_guess.append(guess_num)    # 将获得的数字存储在列表中
+    player_list.append(player_guess)      # 将猜测数组存在列表中
+
+
+# 定义函数判断玩家猜测数字正确性
+def judgment():
+    global n, m
+    m = 0        # 每次判断前，先将m和n的计数初始化，用来存储新的数字记录
+    n = 0
+    for a in computer_list:          # 定义循环来判断所猜测数字是否在列表
+        for b in player_guess:
+            if a == b:
+                m += 1
+    for k in range(4):        # 定义循环来判断所猜测数字是否完全正确，包括位置和数值。
+        if computer_list[k] == player_guess[k]:
+            n += 1
+    result1.append(n)
+    result2.append(m-n)
+
+
+# 定义一个函数来判断玩家是否想在继续玩
+def again():
+    player = input('*******如想再玩一局请输入y，输入其他退出，游戏结束！*******')
+    if player == 'y':
+        main_play()
+    else:
+        print('-----Game Over-------')
+
+
+# 定义主运行函数
+def main_play():
+    global player_guess    # 将数组定义为全局变量
+    global player_list
+    player_list = []       # 初始化猜测数组列表
+
+    computer_num()         # 调用函数获得电脑随机数组
+
+    for i in range(10):    # 利用循环定义玩家猜测次数限制，此处定义玩家最多猜测10次
+        print('------第{}次猜测开始--------'.format(i+1))
+        # print(computer_list)   # 用来测试查看电脑随机数组,正式游戏需要去除此代码
+
+        player_num()   # 调用函数获得玩家输入信息
+
+        judgment()   # 调用函数判断结果
+
+        print('您当前的猜测如下：')                # 展示玩家当前所有猜测结果
+        for a in range(len(player_list)):
+            print('No.{}:'.format(a+1), player_list[a], '结果：{}个数字，数值和位置猜对; {}个数字，仅位置猜对!'.format(result1[a], result2[a]))
+
+        player_guess = []   # 初始化列表内容，以便能重复利用列表
+
+        if n == 4:          # 当玩家10次以内猜测出结果时，停止循环
+            print('YOU WIN, 你总共猜测了{}次，非常厉害！!'.format(i + 1))
+            break
+
+    if i == 9 and n != 4:
+        print('抱歉，您没有猜中，YOU LOST！')
+    print('电脑的数字是：{}'.format(computer_list))
+
+    again()   # 调用函数，看玩家是否想再玩一局
+
+
+if __name__ == '__main__':
+    main_play()
